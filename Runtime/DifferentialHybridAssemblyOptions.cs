@@ -10,17 +10,26 @@ namespace HybridCLR.Runtime
 
         public List<uint> notChangeMethodTokens;
 
+        public List<uint> notChangeTypeTokens;
 
         public byte[] Marshal()
         {
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
             writer.Write(Signature);
+
             writer.Write((uint)notChangeMethodTokens.Count);
             foreach (uint token in notChangeMethodTokens)
             {
                 writer.Write(token);
             }
+
+            writer.Write((uint)notChangeTypeTokens.Count);
+            foreach(uint token in notChangeTypeTokens)
+            {
+                writer.Write(token);
+            }
+
             writer.Flush();
             stream.Flush();
             byte[] result = new byte[stream.Length];

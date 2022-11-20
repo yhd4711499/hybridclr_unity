@@ -30,6 +30,16 @@ namespace HybridCLR.Editor.DHE
             _options = options;
         }
 
+        private bool IsUnchanged(CustomAttributeCollection cac)
+        {
+            var attr = cac.Where(a => a.AttributeType.FullName == "HybridCLR.Runtime.UnchangedAttribute").FirstOrDefault();
+            if (attr != null)
+            {
+                return (bool)attr.ConstructorArguments[0].Value;
+            }
+            return false;
+        }
+
         public void Generate()
         {
             foreach(string assName in _options.DifferentialHybridAssembyList)
@@ -41,20 +51,22 @@ namespace HybridCLR.Editor.DHE
                     var dhaOptions = new DifferentialHybridAssemblyOptions()
                     {
                         notChangeMethodTokens = new List<uint>(),
+                        notChangeTypeTokens = new List<uint>(),
                     };
 
                     foreach (var type in ass.GetTypes())
                     {
+                        if (IsUnchanged(type.CustomAttributes))
+                        {
+                            dhaOptions.notChangeTypeTokens.Add(type.MDToken.Raw);
+                            Debug.Log($"[AssemblyOptionDataGenerator] unchanged type:{type} {type.MDToken.Raw}");
+                        }
                         foreach (var method in type.Methods)
                         {
-                            var attr = method.CustomAttributes.Where(a => a.AttributeType.FullName == "HybridCLR.Runtime.UnchangedAttribute").FirstOrDefault();
-                            if (attr != null)
+                            if (IsUnchanged(method.CustomAttributes))
                             {
-                                if ((bool)attr.ConstructorArguments[0].Value)
-                                {
-                                    dhaOptions.notChangeMethodTokens.Add(method.MDToken.Raw);
-                                    Debug.Log($"Unchanged method:{method.MDToken.Raw}  {method}");
-                                }
+                                dhaOptions.notChangeMethodTokens.Add(method.MDToken.Raw);
+                                Debug.Log($"[AssemblyOptionDataGenerator] unchanged method:{method} {method.MDToken.Raw}");
                             }
                         }
                     }
