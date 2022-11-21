@@ -15,9 +15,10 @@ namespace HybridCLR.Editor.Commands
         [MenuItem("HybridCLR/Generate/Il2CppDef", priority = 104)]
         public static void GenerateIl2CppDef()
         {
-            var options = new Il2CppDef.Il2CppDefGenerator.Options()
+                var options = new Il2CppDef.Il2CppDefGenerator.Options()
             {
                 UnityVersion = UnityEngine.Application.unityVersion,
+                DifferentialHybridAssemblyList = HybridCLRSettings.Instance.differentialHybridAssemblies,
                 OutputFile = $"{SettingsUtil.LocalIl2CppDir}/libil2cpp/hybridclr/Il2CppCompatibleDef.h",
             };
 
