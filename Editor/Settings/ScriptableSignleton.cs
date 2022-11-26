@@ -27,7 +27,7 @@ namespace HybridCLR.Editor
             if (!string.IsNullOrEmpty(filePath))
             {
                 var arr = InternalEditorUtility.LoadSerializedFileAndForget(filePath);
-                s_Instance = arr.Length > 0 ? arr[0] as T : s_Instance??CreateInstance<T>();
+                s_Instance = arr.Length > 0 ? arr[0] as T : ReferenceEquals(s_Instance, null) ? CreateInstance<T>() : s_Instance;
             }
             else
             {
